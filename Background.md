@@ -2,7 +2,7 @@
 Investigating what network-based features correspond to chordal extensions
 
 ## Background
-In many areas of semidefinite optimisation, the aim is to quickly solve a large system of equations. We can represented the matrix as a graph, making the graph chordal means that we can quickly then solve this system by picking a good decomposition. This project aims to invesigate the former property of chordality and what features may correspond to chordality of the graph. The network based features of a graph are as follows:
+In many areas of semidefinite optimisation, the aim is to quickly solve a large system of equations. We can represent the matrix as a graph, making the graph chordal means that we can quickly then solve this system by picking a good decomposition. This project aims to invesigate the former property of chordality and what features may correspond to chordality of the graph. The network based features of a graph are as follows:
 - Number of verticies
 - Number of Edges
 - The maximum degree
