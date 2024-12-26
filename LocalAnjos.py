@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[81]:
-
-
 import networkx as nx
 import numpy as np
 import random
@@ -32,19 +26,18 @@ def get_features(G):
     Returns:
         Dictionary of features
     """
-    #no.of triangles including edge or vertex, does it double count?
+    #no.of triangles including edge or vertex
     triangles = nx.triangles(G)
-    #print(triangles)
-    
-    #avoid double count? 
+
     sum_deg_C_2 = 0 #Sum of (degree Choose 2)
     degrees = []
     for v,d in G.degree():
         degrees.append(d)
         #can use math.comb(d,2)
         sum_deg_C_2 += d*(d-1)/2
-    
-    try : 
+    #avoid zero error
+    try :
+        #sum as the triangles returns dictionary of nodes. Global is given by total closed triads/total triads.
         gc = sum(triangles.values())/ sum_deg_C_2
     except ZeroDivisionError:
         gc = 0
@@ -99,9 +92,11 @@ def generate_dataset(num_samples, min_nodes = 5, max_nodes = 20):
     
     return features_list, chordal
 
+def main():
 
-# In[130]:
-
+"""Initial Trends investigated for n nodal graphs 
+in regards to global clustering coefficient.
+Graphs of different edge probability generated for each n value."""
 
 n= np.linspace(0,1,1000)
 
@@ -114,43 +109,21 @@ for i in range(5,11):
             h = features["global_clustering"]
             if h != 0:
                 data.append(h)
-            
+    
+    """NOTE: len data when investigated against different attributes varies?
+    i.e. chordal graphs more when investigating mean degree as opposed to global clustering. why? """  
+    
     print(len(data))    
     plt.hist(data)
     # Adding labels and title
     plt.xlabel('Global Clustering')
     plt.ylabel('Frequency')
-    plt.title(f'Global Clustering for {i} nodal graph with varying probability of connection between 0 and 1')
+    plt.title(f'Global Clustering for {i} nodal chordal graph with varying probability of connection between 0 and 1')
     # Display the plot
     plt.show()
 
+main()
 
-# In[132]:
-
-
-n= np.linspace(0,1,1000)
-
-for i in range(5,11):
-    data = []
-    for j in n: 
-        G = generate_graph(i, j)
-        if is_chordal(G):
-            features = get_features(G)
-            h = features['mean_degree']
-            if h != 0:
-                data.append(h)
-
-    print(len(data))
-    plt.hist(data)
-    # Adding labels and title
-    plt.xlabel('Mean_Degree')
-    plt.ylabel('Frequency')
-    plt.title(f'Mean_Degree for {i} nodal chordal graph with varying probability of connection between 0 and 1')
-    # Display the plot
-    plt.show()
-
-
-# In[ ]:
 
 
 
