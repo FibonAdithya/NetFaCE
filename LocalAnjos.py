@@ -94,33 +94,33 @@ def generate_dataset(num_samples, min_nodes = 5, max_nodes = 20):
 
 def main():
 
-"""Initial Trends investigated for n nodal graphs 
-in regards to global clustering coefficient.
-Graphs of different edge probability generated for each n value."""
+    """Initial Trends investigated for n nodal graphs 
+    in regards to global clustering coefficient.
+    Graphs of different edge probability generated for each n value."""
 
-n= np.linspace(0,1,1000)
+    n= np.linspace(0,1,1000)
 
-for i in range(5,11):
-    data = []
-    for j in n: 
-        G = generate_graph(i, j)
-        if is_chordal(G):
-            features = get_features(G)
-            h = features["global_clustering"]
-            if h != 0:
-                data.append(h)
-    
-    """NOTE: len data when investigated against different attributes varies?
-    i.e. chordal graphs more when investigating mean degree as opposed to global clustering. why? """  
-    
-    print(len(data))    
-    plt.hist(data)
-    # Adding labels and title
-    plt.xlabel('Global Clustering')
-    plt.ylabel('Frequency')
-    plt.title(f'Global Clustering for {i} nodal chordal graph with varying probability of connection between 0 and 1')
-    # Display the plot
-    plt.show()
+    for i in range(5,11):
+        data = []
+        for j in n: 
+            G = generate_graph(i, j)
+            if is_chordal(G):
+                features = get_features(G)
+                h = features["global_clustering"]
+                if h != 0:
+                    data.append(h)
+        
+        """NOTE: len data when investigated against different attributes varies?
+        i.e. chordal graphs more when investigating mean degree as opposed to global clustering. why? """  
+        
+        print(len(data))    
+        plt.hist(data)
+        # Adding labels and title
+        plt.xlabel('Global Clustering')
+        plt.ylabel('Frequency')
+        plt.title(f'Global Clustering for {i} nodal chordal graph with varying probability of connection between 0 and 1')
+        # Display the plot
+        plt.show()
 
 main()
 

@@ -23,21 +23,26 @@ def get_features(G):
     Returns:
         Dictionary of features
     """
-    triangles = nx.triangles(G)
+    triangles = sum(nx.triangles(G).values())/3 #Divide by 3 to remove triple counting
     sum_deg_C_2 = 0 #Sum of (degree Choose 2)
     degrees = []
     for v,d in G.degree():
         degrees.append(d)
         sum_deg_C_2 += d*(d-1)/2
     
+    try:
+        global_clustering = triangles/sum_deg_C_2
+    except ZeroDivisionError:
+        global_clustering = 0
+    
     features = {
-        'num_vertices': G.number_of_nodes(),
-        'num_edges': G.number_of_edges(),
+        'num_vertices': len(G.nodes),
+        'num_edges': len(G.edges),
         'max_degree': max(degrees),
         'min_degree': min(degrees),
         'mean_degree': np.mean(degrees),
-        'avg_clustering': nx.average_clustering(G),
-        'global_clustering': triangles/sum_deg_C_2,
+        'average_clustering': nx.average_clustering(G),
+        'global_clustering': global_clustering,
         'density': nx.density(G)
     }
 
@@ -54,7 +59,6 @@ def get_features(G):
 def is_chordal(G: nx.Graph) -> bool:
     """
     Check if a graph is chordal
-    
     Args:
         G: NetworkX graph object
     Returns:
@@ -78,4 +82,4 @@ def generate_dataset(num_samples, min_nodes = 5, max_nodes = 20):
         features_list.append(features)
         chordal.append(is_chordal_graph)
     
-    return features_list, chordal
+    return (features_list, chordal)

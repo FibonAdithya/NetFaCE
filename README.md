@@ -1,44 +1,49 @@
-This is a read me file to explain the code.
+This is a read me file to explain the changes that we've made to code and how to use it.
 
-# Data Generation
+# Feature Distribution
 
-This script provides utilities to generate random graphs, compute their features, and determine if they are chordal. It also includes functionality to create datasets containing graph features and their chordality status.
+This script provides utilities to generate graph data using specified parameters and visualize the relationships between features and their chordality status.
 
 ---
 
 ## Overview
 
-This script uses the `NetworkX` library to:
-- Generate random graphs using the Erdős-Rényi model.
-- Compute key features of a graph, such as the number of nodes, edges, clustering coefficients, and density.
-- Check whether a graph is **chordal** (i.e., every cycle of four or more vertices has a chord).
-- Create datasets of graph features paired with their chordality status.
-
+This script includes two main functionalities:
+1. **Data Generation:** Generate features and chordality labels for graphs based on the Erdős-Rényi model.
+2. **Visualization:** Create histograms to compare the distribution of selected graph features for chordal and non-chordal graphs.
 ---
 
 ## Usage Examples
 
-### 1. Generate a Random Graph and Compute Features
+### 1. Generate and visualise the data
 
 ```python
-import networkx as nx
-from data_generation import generate_graph, get_features
+import feature_distribution
+import matplotlib.pyplot as plt
 
-G = generate_graph(10, 0.5)
-features = get_features(G)
-print(features)
+verticies = 10
+dataset = feature_distribition.generate_graph_data(V = verticies, samples=1000)
+features_list, chordal_labels = dataset
+print(features_list[0], chordal_labels[0])
+
+# Selected features to visualize
+selected_features = ['num_vertices', 'density', 'max_degree']
+
+# Visualize the dataset
+fig = feature_distribution.visualise(dataset, selected_features=selected_features)
+plt.show()
 ```
 
-### 2. Check if a Graph is chordal
+### 2. LocalAnjos script
+The local Anjos script that you wrote now becomes
+
 ```python
-from data_generation import is_chordal
+import feature_distribution
+import matplotlib.pyplot as plt
 
-is_chordal_graph = is_chordal(G)
-print(f"Is the graph chordal? {is_chordal_graph}")
+selected_features = ["global_clustering"]
+for i in range(5,11):
+    data = feature_distribution.generate_graph_data(V = i, samples = 1000)
+    fig = feature_distribution.visualise(data, selected_features, V = i)
+    plt.show()
 ```
-
-### 3. Generate a Dataset
-from data_generation import generate_dataset
-
-features_list, chordal_status = generate_dataset(100)
-print(features_list[0], chordal_status[0])
