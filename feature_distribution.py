@@ -69,6 +69,26 @@ def visualise(dataset, selected_features = None,
     plt.tight_layout()
     return fig
 
+def correlation(dataset, features = None):
+    features_list = dataset[0]
+    chordal = dataset[1]
+    df = pd.DataFrame(features_list)
+
+    df["Chordal"] = chordal
+
+    # Calculate correlations
+    corr_matrix = df.corr()
+    
+    # Create heatmap
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr_matrix, 
+                annot=True,  # Show correlation values
+                cmap='coolwarm',  # Color scheme
+                vmin=-1, vmax=1,  # Value range
+                center=0)  # Center color map at 0
+    plt.title('Correlation Matrix of Graph Metrics')
+
+    return corr_matrix
 
 
 

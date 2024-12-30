@@ -11,6 +11,8 @@ This script provides utilities to generate graph data using specified parameters
 This script includes two main functionalities:
 1. **Data Generation:** Generate features and chordality labels for graphs based on the Erdős-Rényi model.
 2. **Visualization:** Create histograms to compare the distribution of selected graph features for chordal and non-chordal graphs.
+3. **Correlation Analysis** Analyse the relationships between features and chordality status using a correlation matrix.
+
 ---
 
 ## Usage Examples
@@ -47,3 +49,12 @@ for i in range(5,11):
     fig = feature_distribution.visualise(data, selected_features, V = i)
     plt.show()
 ```
+
+### 3. See Correlation Matrix
+```python
+from feature_distribution import correlation
+from data_generation import generate_dataset
+dataset = generate_dataset(100)
+
+corr_matrix = correlation(dataset)
+plt.show()
