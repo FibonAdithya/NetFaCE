@@ -42,3 +42,49 @@ from data_generation import generate_dataset
 features_list, chordal_status = generate_dataset(100)
 print(features_list[0], chordal_status[0])
 ```
+
+# Feature Distribution
+
+This script provides utilities to generate graph data using specified parameters and visualize the relationships between features and their chordality status.
+
+---
+
+## Overview
+
+This script includes two main functionalities:
+1. **Data Generation:** Generate features and chordality labels for graphs based on the Erdős-Rényi model.
+2. **Visualization:** Create histograms to compare the distribution of selected graph features for chordal and non-chordal graphs.
+3. **Correlation Analysis** Analyse the relationships between features and chordality status using a correlation matrix.
+
+---
+
+## Usage Examples
+
+### 1. Generate and visualise the data
+
+```python
+import feature_distribution
+import matplotlib.pyplot as plt
+
+verticies = 10
+dataset = feature_distribition.generate_graph_data(V = verticies, samples=1000)
+features_list, chordal_labels = dataset
+print(features_list[0], chordal_labels[0])
+
+# Selected features to visualize
+selected_features = ['num_vertices', 'density', 'max_degree']
+
+# Visualize the dataset
+fig = feature_distribution.visualise(dataset, selected_features=selected_features)
+plt.show()
+```
+
+### 2. See Correlation Matrix
+```python
+from feature_distribution import correlation
+from data_generation import generate_dataset
+dataset = generate_dataset(100)
+
+corr_matrix = correlation(dataset)
+plt.show()
+```

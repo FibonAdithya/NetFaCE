@@ -1,60 +1,73 @@
 This is a read me file to explain the changes that we've made to code and how to use it.
 
-# Feature Distribution
-
-This script provides utilities to generate graph data using specified parameters and visualize the relationships between features and their chordality status.
-
----
+# Classification
+This script provides utilities for preprocessing, training, evaluating, and visualizing machine learning models to classify chordal graphs based on graph metrics.
 
 ## Overview
+The script includes the following functionalities:
 
-This script includes two main functionalities:
-1. **Data Generation:** Generate features and chordality labels for graphs based on the Erdős-Rényi model.
-2. **Visualization:** Create histograms to compare the distribution of selected graph features for chordal and non-chordal graphs.
-3. **Correlation Analysis** Analyse the relationships between features and chordality status using a correlation matrix.
-
----
+- Preprocessing: Clean and prepare graph data for machine learning models.
+- Model Training: Train and evaluate various classifiers, including Logistic Regression, K-Nearest Neighbors, SVM, Decision Trees, Random Forest, and XGBoost.
+- Model Comparison: Compare models based on their performance metrics.
+- Visualization: Explore feature importance, logistic regression coefficients, and decision tree structures.
 
 ## Usage Examples
 
-### 1. Generate and visualise the data
+### 1. Preproccessing
+Prepares the data by handling missing values, scaling features, and splitting into training and test sets.
 
 ```python
-import feature_distribution
-import matplotlib.pyplot as plt
+from classification import preprocessing
 
-verticies = 10
-dataset = feature_distribition.generate_graph_data(V = verticies, samples=1000)
-features_list, chordal_labels = dataset
-print(features_list[0], chordal_labels[0])
-
-# Selected features to visualize
-selected_features = ['num_vertices', 'density', 'max_degree']
-
-# Visualize the dataset
-fig = feature_distribution.visualise(dataset, selected_features=selected_features)
-plt.show()
+# Dataset with features and chordality labels
+X_train, X_test, y_train, y_test = preprocessing(dataset, split=0.3)
 ```
 
-### 2. LocalAnjos script
-The local Anjos script that you wrote now becomes
-
+### 2. Training and Evaluating Models
 ```python
-import feature_distribution
-import matplotlib.pyplot as plt
+import classification
 
-selected_features = ["global_clustering"]
-for i in range(5,11):
-    data = feature_distribution.generate_graph_data(V = i, samples = 1000)
-    fig = feature_distribution.visualise(data, selected_features, V = i)
-    plt.show()
+#Logistic Regression
+lr = classification.logistic_regression(X_train, X_test, y_train, y_test)
+
+#K-nearest neighbour
+knn = K_nearest_neighbour(X_train, X_test, y_train, y_test)
+
+#Support Vector Machine
+svm = support_vector_machine(X_train, X_test, y_train, y_test)
+
+#Decision Tree
+dt = decision_tree_classifier(X_train, X_test, y_train, y_test)
+
+#Random Forest
+rf = random_forrest(X_train, X_test, y_train, y_test)
+
+#XGBoost
+xgb = xgboost_classifier(X_train, X_test, y_train, y_test)
 ```
 
-### 3. See Correlation Matrix
+### 3. Comparing Models
+Use the compare_models function to train all classifiers and view their performance:
 ```python
-from feature_distribution import correlation
-from data_generation import generate_dataset
-dataset = generate_dataset(100)
+from classification import compare_models
 
-corr_matrix = correlation(dataset)
+results = compare_models(X_train, X_test, y_train, y_test)
+print(results)
+```
+
+### 4. Visualizing Feature Importance and Coefficients
+```python
+import classification
+from script import plot_feature_importance
+import matplotlib.pyplot as plt
+#Feature Importance (Random Forest & XGBoost)
+rf_importance, xgb_importance = classification.plot_feature_importance(X_train, y_train)
+
+#Logistic Regression Coefficients
+coef_df = classification.plot_logistic_coefficients(X_train, y_train)
+
+#Decision Tree Visualization
+tree_clf = classification.visualize_decision_tree(X_train, y_train, max_depth=3)
+
 plt.show()
+```
