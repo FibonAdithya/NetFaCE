@@ -1,28 +1,22 @@
+import dtreeviz.trees
 import pandas as pd
 import numpy as np
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
-
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV
-from xgboost import XGBClassifier
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 def preprocessing(dataset, cols = None, split = 0.3):
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.impute import SimpleImputer
+    from sklearn.model_selection import train_test_split
 
     # Create DataFrame and add target variable
-    df = pd.DataFrame(dataset[0])
-    df["Chordal"] = dataset[1]
+    if type(dataset) is tuple:
+        df = pd.DataFrame(dataset[0])
+        df["Chordal"] = dataset[1]
     
     # Handle infinite values
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -50,6 +44,12 @@ def preprocessing(dataset, cols = None, split = 0.3):
     return train_test_split(X, y, test_size=split, random_state=7)
 
 def print_score(clf, X_train, y_train, X_test, y_test, train=True):
+    if X_train is None:
+        return f"ERROR no test data for X was provided"
+    elif y_test is None:
+        return f"ERROR no test data for y was provided"
+    
+    print(f"{clf} \n ====================================================")
     if train:
         pred = clf.predict(X_train)
         clf_report = pd.DataFrame(classification_report(y_train, pred, output_dict=True))
@@ -60,7 +60,7 @@ def print_score(clf, X_train, y_train, X_test, y_test, train=True):
         print("_______________________________________________")
         print(f"Confusion Matrix: \n {confusion_matrix(y_train, pred)}\n")
         
-    elif train==False:
+    else:
         pred = clf.predict(X_test)
         clf_report = pd.DataFrame(classification_report(y_test, pred, output_dict=True))
         print("Test Result:\n================================================")        
@@ -72,114 +72,136 @@ def print_score(clf, X_train, y_train, X_test, y_test, train=True):
 
 
 
-def logistic_regression(X_train, X_test, y_train, y_test, print = True):
+def logistic_regression(X_train, y_train, X_test = None, y_test = None, print = False):
+    from sklearn.linear_model import LogisticRegression
+
     lr_clf = LogisticRegression(solver='liblinear')
     lr_clf.fit(X_train, y_train)
 
     if print:
         print_score(lr_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(lr_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return lr_clf
 
-def K_nearest_neighbour(X_train, X_test, y_train, y_test, print = True):
+def K_nearest_neighbour(X_train, y_train, X_test = None, y_test = None,  print = False):
+    from sklearn.neighbors import KNeighborsClassifier
+
     knn_clf = KNeighborsClassifier()
     knn_clf.fit(X_train, y_train)
 
     if print:
         print_score(knn_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(knn_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return knn_clf
 
-def support_vector_machine(X_train, X_test, y_train, y_test, print = True):
+def support_vector_machine(X_train, y_train, X_test = None, y_test = None,  print = False):
+    from sklearn.svm import SVC
+
     svm_clf = SVC(kernel='rbf', gamma=0.1, C=1.0)
     svm_clf.fit(X_train, y_train)
 
     if print:
         print_score(svm_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(svm_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return svm_clf
 
-def decision_tree_classifier(X_train, X_test, y_train, y_test, print = True):
+def decision_tree(X_train, y_train, X_test = None, y_test = None,  print = False):
+    from sklearn.tree import DecisionTreeClassifier
+
     tree_clf = DecisionTreeClassifier(random_state=42)
     tree_clf.fit(X_train, y_train)
 
     if print:
         print_score(tree_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(tree_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return tree_clf
 
-def random_forrest(X_train, X_test, y_train, y_test, print = True):
+def random_forrest(X_train, y_train, X_test = None, y_test = None,  print = False):
+    from sklearn.ensemble import RandomForestClassifier
+
     rf_clf = RandomForestClassifier(n_estimators=1000, random_state=42)
     rf_clf.fit(X_train, y_train)
 
     if print:
         print_score(rf_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(rf_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return rf_clf
 
-def xgboost_classifier(X_train, X_test, y_train, y_test, print = True):
+def xgboost(X_train, y_train, X_test = None, y_test = None,  print = False):
+    from xgboost import XGBClassifier
+
     xgb_clf = XGBClassifier(use_label_encoder=False)
     xgb_clf.fit(X_train, y_train)
 
     if print:
         print_score(xgb_clf, X_train, y_train, X_test, y_test, train=True)
         print_score(xgb_clf, X_train, y_train, X_test, y_test, train=False)
+    
+    return xgb_clf
 
-def compare_models(X_train, X_test, y_train, y_test):
+def compare_models(X_train, y_train, X_test, y_test, models = None):
     """
     Run multiple classifiers and compare their performance
     """
-    models = {
-        'Logistic Regression': logistic_regression,
-        'KNN': K_nearest_neighbour,
-        'SVM': support_vector_machine,
-        'Decision Tree': decision_tree_classifier,
-        'Random Forest': random_forrest,
-        'XGBoost': xgboost_classifier
-    }
-    
     results = []
-    
-    for name, model_func in models.items():
-        # Run model without printing
-        model_func(X_train, X_test, y_train, y_test, print=False)
+    if models is None:
+        models = {
+            'Logistic Regression': logistic_regression,
+            'KNN': K_nearest_neighbour,
+            'SVM': support_vector_machine,
+            'Decision Tree': decision_tree,
+            'Random Forest': random_forrest,
+            'XGBoost': xgboost
+        }
         
-        # Get classifier instance
-        if name == 'Logistic Regression':
-            clf = LogisticRegression(solver='liblinear')
-        elif name == 'KNN':
-            clf = KNeighborsClassifier()
-        elif name == 'SVM':
-            clf = SVC(kernel='rbf', gamma=0.1, C=1.0)
-        elif name == 'Decision Tree':
-            clf = DecisionTreeClassifier(random_state=42)
-        elif name == 'Random Forest':
-            clf = RandomForestClassifier(n_estimators=1000, random_state=42)
-        else:  # XGBoost
-            clf = XGBClassifier(use_label_encoder=False)
+        for name, model_func in models.items():
+            # Run model
+            clf = model_func(X_train, y_train)
             
-        clf.fit(X_train, y_train)
-        
-        # Get scores
-        train_pred = clf.predict(X_train)
-        test_pred = clf.predict(X_test)
-        
-        train_acc = accuracy_score(y_train, train_pred) * 100
-        test_acc = accuracy_score(y_test, test_pred) * 100
-        
-        results.append({
-            'Model': name,
-            'Train Accuracy': train_acc,
-            'Test Accuracy': test_acc,
-            'Difference': train_acc - test_acc
-        })
+            # Get scores
+            train_pred = clf.predict(X_train)
+            test_pred = clf.predict(X_test)
+            
+            train_acc = accuracy_score(y_train, train_pred) * 100
+            test_acc = accuracy_score(y_test, test_pred) * 100
+            
+            results.append({
+                'Model': name,
+                'Train Accuracy': train_acc,
+                'Test Accuracy': test_acc,
+                'Difference': train_acc - test_acc
+            })
+    else:
+        for model in models:
+            train_pred = model.predict(X_train)
+            test_pred = model.predict(X_test)
+
+            train_acc = accuracy_score(y_train, train_pred) * 100
+            test_acc = accuracy_score(y_test, test_pred) * 100
+
+            results.append({
+                'Model': f"{model}",
+                'Train Accuracy': train_acc,
+                'Test Accuracy': test_acc,
+                'Difference': train_acc - test_acc
+            })
     
     return pd.DataFrame(results).round(2)
 
 
-def plot_feature_importance(X_train, y_train):
+def plot_feature_importance(X_train, y_train, rf=None, xgb=None):
     # Random Forest Feature Importance
-    rf = RandomForestClassifier(n_estimators=1000, random_state=42)
-    rf.fit(X_train, y_train)
+    if rf is None:
+        rf = random_forrest(X_train, y_train)
     
     # XGBoost Feature Importance
-    xgb = XGBClassifier(use_label_encoder=False)
-    xgb.fit(X_train, y_train)
+    if xgb is None:
+        xgb = xgboost(X_train, y_train)
     
     # Create figure with subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
@@ -205,10 +227,10 @@ def plot_feature_importance(X_train, y_train):
     plt.tight_layout()
     return importances_rf, importances_xgb
 
-def plot_logistic_coefficients(X_train, y_train):
+def plot_logistic_coefficients(X_train, y_train, lr=None):
     # Logistic Regression Coefficients
-    lr = LogisticRegression(solver='liblinear')
-    lr.fit(X_train, y_train)
+    if lr is None:
+        lr = logistic_regression(X_train, y_train)
     
     plt.figure(figsize=(10, 6))
     coef_df = pd.DataFrame({
@@ -220,15 +242,16 @@ def plot_logistic_coefficients(X_train, y_train):
     plt.title('Logistic Regression Coefficients')
     return coef_df
 
-def visualize_decision_tree(X_train, y_train, max_depth=3):
+def visualize_decision_tree(X_train, y_train, max_depth=3, tree_clf = None):
     from sklearn.tree import plot_tree
+    from supertree import SuperTree
     """
     Create and visualize a decision tree classifier
     max_depth parameter limits tree depth for better visualization
     """
-    # Create and train a decision tree
-    tree_clf = DecisionTreeClassifier(random_state=42, max_depth=max_depth)
-    tree_clf.fit(X_train, y_train)
+    if tree_clf is None:
+        # Create and train a decision tree
+        tree_clf = decision_tree(X_train, y_train)
     
     # Set up the figure with a larger size
     plt.figure(figsize=(20,10))
@@ -242,5 +265,4 @@ def visualize_decision_tree(X_train, y_train, max_depth=3):
               fontsize=10)
     
     plt.title("Decision Tree for Chordal Graph Classification")
-    
-    return tree_clf
+

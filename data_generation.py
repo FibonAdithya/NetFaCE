@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import random
+import pandas as pd
 
 def generate_graph(n, p):
     """
@@ -83,3 +84,36 @@ def generate_dataset(num_samples, min_nodes = 5, max_nodes = 20):
         chordal.append(is_chordal_graph)
     
     return (features_list, chordal)
+
+def save_dataset(dataset):
+    import os
+    df = pd.DataFrame(dataset[0])
+    df["Chordal"] = dataset[1]
+
+    n = 0
+    for x in os.listdir():
+        if x.endswith(".csv"):
+            n += 1
+    
+    filename = f"dataset_{n}.csv"
+
+    df.to_csv(filename, index=False, compression='gzip')
+
+def load_datasets():
+    import os
+    import glob
+    #set working directory
+    #os.chdir("/mydir")
+
+    #find all csv files in the folder
+    #use glob pattern matching -> extension = 'csv'
+    #save result in list -> all_filenames
+    extension = 'csv'
+    all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
+    #print(all_filenames)
+
+    #combine all files in the list
+    combined_csv = pd.concat([pd.read_csv(f, compression='gzip') for f in all_filenames ])
+
+    return combined_csv
+
