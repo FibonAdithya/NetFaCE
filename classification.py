@@ -17,7 +17,8 @@ def preprocessing(dataset, cols = None, split = 0.3):
     if type(dataset) is tuple:
         df = pd.DataFrame(dataset[0])
         df["Chordal"] = dataset[1]
-    
+    else:
+        df = dataset
     # Handle infinite values
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
     
