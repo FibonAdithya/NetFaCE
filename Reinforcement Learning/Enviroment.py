@@ -85,26 +85,12 @@ class ChordalGraphEnv():
         return features
 
     def generate_reward(self):
-        return 1/self.generate_reward()
+        return 1/self.heuristic_1()
 
     def step(self, merge):
         self.merge_cliques(merge)
-
-        #reconstruct the original graph
-        edges = []
-        nodes = set()
-        for clique in self.clique_graph:
-            nodes.update(clique)  # Capture all nodes
-            for i in range(len(clique)):
-                for j in range(i + 1, len(clique)):
-                    edges.append((clique[i], clique[j]))
-        G = nx.Graph()
-        G.add_nodes_from(nodes)  # Add isolated nodes
-        G.add_edges_from(edges)
-        self.G = G
         if self._is_chordal():
             return self.get_state(), True
-
         return self.get_state(), False
 
     def heuristic_1(self, m= 0):
@@ -132,33 +118,14 @@ class ChordalGraphEnv():
     def merge_cliques(self, merge):
         clique_a, clique_b = merge
         # Ensure cliques are stored as sorted tuples for consistency
-        clique_a = tuple(sorted(clique_a))
-        clique_b = tuple(sorted(clique_b))
+        set_a = set(clique_a)
+        set_b = set(clique_b)
         
-        # Check if the union is a valid clique in the original graph
-        merged_nodes = set(clique_a) | set(clique_b)
-        if not self.is_clique(merged_nodes):
-            return  # Do not merge if the union is not a clique
+        for a in set_a:
+            for b in set_b:
+                if a != b:  # Prevent self-loops
+                    self.G.add_edge(a, b)
         
-        # Remove the original cliques (using list comprehension to avoid reference issues)
-        self.Cliques = [c for c in self.Cliques if c not in (clique_a, clique_b)]
-        
-        # Check if the merged clique is maximal
-        merged_clique = tuple(sorted(merged_nodes))
-        is_maximal = True
-        for clique in self.Cliques:
-            if merged_nodes.issubset(clique):
-                is_maximal = False
-                break
-        
-        # Add the merged clique only if it is maximal
-        if is_maximal:
-            # Remove existing cliques that are subsets of the merged clique
-            self.Cliques = [c for c in self.Cliques if not set(c).issubset(merged_nodes)]
-            self.Cliques.append(merged_clique)
-        
-        # Sort for consistency
-        self.Cliques.sort()
     
     def is_clique(self, nodes):
         return all(self.G.has_edge(u, v) for u in nodes for v in nodes if u != v)
