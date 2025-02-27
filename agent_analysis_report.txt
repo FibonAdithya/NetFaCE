@@ -1,0 +1,55 @@
+=== AGENT STRATEGY ANALYSIS REPORT ===
+
+1. EPISODE REWARDS
+-----------------
+Mean reward: 0.0057
+Std deviation: 0.0013
+Min reward: 0.0034
+Max reward: 0.0114
+
+2. MERGE PATTERNS
+----------------
+Average clique sizes: 7.87 and 7.73
+Average total size: 15.60
+Average size difference: 5.05
+Most common merge patterns:
+  Clique1: 3, Clique2: 3, Count: 141, Frequency: 0.11
+  Clique1: 2, Clique2: 2, Count: 105, Frequency: 0.08
+  Clique1: 3, Clique2: 2, Count: 88, Frequency: 0.07
+  Clique1: 4, Clique2: 2, Count: 83, Frequency: 0.06
+  Clique1: 4, Clique2: 3, Count: 82, Frequency: 0.06
+
+3. FEATURE IMPORTANCE
+--------------------
+num_vertices: nan
+num_edges: nan
+max_degree: nan
+min_degree: nan
+mean_degree: nan
+max_clique_size: nan
+avg_clique_size: nan
+clique_size_std: nan
+average_clustering: nan
+global_clustering: nan
+density: nan
+diameter: nan
+radius: nan
+
+4. STATE CLUSTERS
+----------------
+Cluster 0: 321 states, 24.5% of total, Average reward: 0.0000
+Cluster 1: 56 states, 4.3% of total, Average reward: 0.0000
+Cluster 2: 381 states, 29.1% of total, Average reward: 0.0000
+Cluster 3: 153 states, 11.7% of total, Average reward: 0.0000
+Cluster 4: 398 states, 30.4% of total, Average reward: 0.0000
+
+5. STATE TRANSITIONS
+-------------------
+Average vertex_change: 0.0008
+Average edge_change: 0.0673
+Average density_change: 0.0003
+Average clustering_change: 0.0004
+Average max_clique_change: 0.0069
+Average reward: 0.0000
+
+=== END OF REPORT ===

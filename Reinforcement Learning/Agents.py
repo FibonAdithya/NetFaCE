@@ -11,7 +11,7 @@ class KNNGraphAgent:
                  epsilon=0.8,
                  max_memory=1000,
                  min_epsilon=0.01,
-                 epsilon_decay=0.995,
+                 epsilon_decay=1-10e-4,
                  batch_size=32):
         """
         k: Number of nearest neighbors to consider

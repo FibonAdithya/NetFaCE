@@ -6,25 +6,44 @@ import time
 
 class ChordalTrainer:
     def __init__(self, agent, env, gamma=0.95, buffer_size=10000, batch_size=32, 
-                 reward_scaling=1.0, save_interval=50, checkpoint_path="./checkpoints/"):
+                 reward_scaling=1.0, save_interval=np.inf, checkpoint_path="./checkpoints/"):
         self.agent = agent             # RL agent
         self.env = env                 # Graph environment
+        # RF Parameters
         self.gamma = gamma             # Discount factor
         self.episode_buffer = deque(maxlen=buffer_size)  # Experience replay buffer
         self.batch_size = batch_size   # Training batch size
         self.reward_scaling = reward_scaling  # Scale rewards for numerical stability
+
+        #Saving
         self.save_interval = save_interval  # Episodes between checkpoints
         self.checkpoint_path = checkpoint_path
-        
-        # Performance tracking
-        self.rewards_history = []
-        self.episode_lengths = []
-        self.best_reward = float('-inf')
-        self.training_start_time = None
-        
         # Create checkpoint directory if it doesn't exist
         import os
         os.makedirs(checkpoint_path, exist_ok=True)
+
+        # Performance tracking
+        self.rewards_history = []
+        self.episode_lengths = []
+        self.best_reward = 0
+        self.training_start_time = None
+
+        # Cache for analysis results
+        self.cache = {
+            'simulation_data': None,
+            'feature_importance': None,
+            'action_patterns': None,
+            'learning_progress': None,
+            'state_transitions': None
+        }
+
+        # Feature names mapping
+        self.feature_names = [
+            'num_vertices', 'num_edges', 'max_degree', 'min_degree', 'mean_degree',
+            'max_clique_size', 'avg_clique_size', 'clique_size_std', 'average_clustering',
+            'global_clustering', 'density', 'diameter', 'radius', 'clique1_size', 'clique2_size'
+        ]
+        
     
     def run_episode(self, training=True, render=False):
         """Run a single episode of training or evaluation"""
@@ -36,7 +55,9 @@ class ChordalTrainer:
         done = False
         start_time = time.time()
         
-        while not done and episode_steps < 1000:  # Safety limit to prevent infinite loops
+        
+        
+        while not done and episode_steps < 100:  # Safety limit to prevent infinite loops
             # Get valid actions
             candidates = self.env.valid_clique_merges()
             
@@ -135,6 +156,8 @@ class ChordalTrainer:
     def train(self, num_episodes=1000, eval_interval=10, warmup_episodes=0):
         """Train the agent with experience replay and periodic evaluation"""
         self.training_start_time = time.time()
+
+        print(f"Running simulation for {num_episodes} episodes...")
         
         for episode in range(num_episodes):
             # Run episode and collect experience
@@ -157,10 +180,10 @@ class ChordalTrainer:
             if (episode + 1) % eval_interval == 0:
                 self._evaluate_agent(3)  # Run 3 evaluation episodes
                 
-            # Save checkpoint
+            """# Save checkpoint
             if (episode + 1) % self.save_interval == 0:
                 self.save_agent(f"checkpoint_{episode+1}")
-                self._save_training_progress(episode+1)
+                self._save_training_progress(episode+1)"""
                 
             # Print progress
             if (episode + 1) % 10 == 0:

@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import random
 class ChordalGraphEnv():
     def _is_chordal(self):
         return nx.is_chordal(self.G)
@@ -9,8 +9,8 @@ class ChordalGraphEnv():
     def _reset(self):
         """Generate a random graph and reset the enviroment
         """
-        #nodes = random.randint(10, 20)
-        nodes = 20 # Keep it constant to make choosing cliques easier.
+        nodes = random.randint(20, 40)
+        #nodes = 20 # Keep it constant to make choosing cliques easier.
         self.G = self._generate_graph(nodes)
         # Keep regenerating while the graph is chordal
         while self._is_chordal():  # Fixed method call with ()
@@ -79,7 +79,7 @@ class ChordalGraphEnv():
         G.remove_nodes_from(list(nx.isolates(G)))
         return G
     
-    def get_state(self):
+    def _get_state(self):
         self.clique_graph = self.find_clique_graph()
         features = self._get_features()
         return features
@@ -90,8 +90,8 @@ class ChordalGraphEnv():
     def step(self, merge):
         self.merge_cliques(merge)
         if self._is_chordal():
-            return self.get_state(), True
-        return self.get_state(), False
+            return self._get_state(), True
+        return self._get_state(), False
 
     def heuristic_1(self, m= 0):
         clique_sum = sum(len(clique) * (len(clique) + 1) / 2 for clique in self.clique_graph)
