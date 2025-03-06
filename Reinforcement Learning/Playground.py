@@ -12,7 +12,8 @@ from sklearn.preprocessing import StandardScaler
 class ChordalPlayground():
     def __init__(self, agent, env, 
                  gamma=0.95, buffer_size=10000, batch_size=32, reward_scaling=1.0,
-                 analysis = True):
+                 analysis = True,
+                 save_interval=np.inf, checkpoint_path="./checkpoints/"):
         #Intialise components
         self.agent = agent
         self.env = env
@@ -24,6 +25,13 @@ class ChordalPlayground():
         self.reward_scaling = reward_scaling  # Scale rewards for numerical stability
 
         self.rewards_history = []
+
+        #Saving
+        self.save_interval = save_interval  # Episodes between checkpoints
+        self.checkpoint_path = checkpoint_path
+        # Create checkpoint directory if it doesn't exist
+        import os
+        os.makedirs(checkpoint_path, exist_ok=True)
 
         # Cache for analysis results
         self.cache = {
@@ -118,7 +126,7 @@ class ChordalPlayground():
         
         return episode_steps, episode_metrics
 
-    def train(self, num_episodes=100, warmup_episodes=10):
+    def train(self, num_episodes=100, warmup_episodes=10, filename = "final_model"):
         self.training_start_time = time.time()
 
         episode_data = []
@@ -131,6 +139,7 @@ class ChordalPlayground():
 
             episode_data.append(episode_metrics)
             # Experience replay learning
+            #print(f"Episode {episode}, buffer type: {type(self.episode_buffer)}")  # Debug
             if len(self.episode_buffer) >= self.batch_size:
                 for _ in range(max(1, steps // 10)):  # Learn multiple times for longer episodes
                     batch = random.sample(list(self.episode_buffer), self.batch_size)
@@ -148,6 +157,8 @@ class ChordalPlayground():
         
         # Cache the results
         self.cache['simulation_data'] = simulation_data
+
+        self.agent.save_model(f"{self.checkpoint_path}/{filename}.npz")
         
 
     def _process_episode(self, episode_log, final_reward):
@@ -160,7 +171,7 @@ class ChordalPlayground():
         discounted_reward = 0
         
         # Work backwards through episode
-        for step in reversed(episode_log):
+        for i, step in enumerate(reversed(episode_log)):
             # Apply discounting: discount * future_reward + current_reward
             # For terminal state, only final_reward applies
             if not rewards:  # First iteration (terminal state)
@@ -173,8 +184,8 @@ class ChordalPlayground():
             rewards.append(discounted_reward)
             
             # Add experience to buffer with next state info
-            idx = episode_log.index(step)
-            next_state = episode_log[idx+1]['state'] if idx < len(episode_log)-1 else None
+            reversed_idx = len(episode_log) - 1 - i
+            next_state = episode_log[reversed_idx+1]['state'] if reversed_idx < len(episode_log)-1 else None
             
             # Store in agent memory and episode buffer
             self.episode_buffer.append((
@@ -220,13 +231,13 @@ class ChordalPlayground():
         self.cache['feature_importance'] = importance
         
         if visualize:
-            plt.figure(figsize=(10, 6))
+            fig = plt.figure(figsize=(10, 6))
             top_features = importance.head(10)
             plt.barh(top_features['Feature'], top_features['Importance'])
             plt.xlabel('Importance')
             plt.title('Top Features Influencing Agent Decisions')
             plt.tight_layout()
-            plt.show()
+            return fig
         
         return importance
     

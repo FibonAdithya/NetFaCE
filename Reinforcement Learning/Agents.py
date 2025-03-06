@@ -182,7 +182,7 @@ class KNNGraphAgent:
             
             q_value = self.get_q_value(candidate_state)
             
-            if q_value > best_q_value:
+            if q_value < best_q_value:
                 best_q_value = q_value
                 best_action = candidate
         

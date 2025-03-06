@@ -14,9 +14,8 @@ class ChordalGraphEnv():
         self.G = self._generate_graph(nodes)
         # Keep regenerating while the graph is chordal
         while self._is_chordal():  # Fixed method call with ()
-            print("Generated chordal graph, regenerating...")
+            print("Generating graph...")
             self.G = self._generate_graph(nodes)
-            print(f"Nodes: {nodes}, Edges: {self.G.number_of_edges()}")
 
     def _get_features(self):
         """
@@ -85,7 +84,7 @@ class ChordalGraphEnv():
         return features
 
     def generate_reward(self):
-        return 1/self.heuristic_1()
+        return self.heuristic_1()
 
     def step(self, merge):
         self.merge_cliques(merge)
