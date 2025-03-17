@@ -10,7 +10,7 @@ class ChordalGraphEnv():
         """Generate a random graph and reset the enviroment
         """
         nodes = random.randint(20, 40)
-        #nodes = 20 # Keep it constant to make choosing cliques easier.
+        nodes = 20 # Keep it constant to make choosing cliques easier.
         self.G = self._generate_graph(nodes)
         # Keep regenerating while the graph is chordal
         while self._is_chordal():  # Fixed method call with ()
